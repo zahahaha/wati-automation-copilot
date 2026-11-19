@@ -46,6 +46,10 @@ The default endpoint uses DeepSeek's `/chat/completions` API. Keep `.env` privat
 
 If DeepSeek is unavailable, a request covered by the offline rules can still run, with a visible notice. Other requests return an error rather than an invented flow. Help article and pricing URLs remain unresolved placeholders until real links are supplied; validation warns about them.
 
+## Demo recording
+
+A 3–5 minute narrated walkthrough is included at [`docs/demo-recording.mp4`](docs/demo-recording.mp4). It follows `docs/demo-script.md` and shows three prompts going through generation, validation, plain-English explanation, and mock simulation: buyer/seller routing, lead qualification, and an intentionally unsafe API call. The clip is tracked in git explicitly despite the `*.mp4` ignore rule.
+
 ## Docker
 
 ```powershell
