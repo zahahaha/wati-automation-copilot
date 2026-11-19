@@ -20,6 +20,21 @@ def test_demo_generator_builds_buyer_seller_flow(monkeypatch) -> None:
     assert {node.type for node in result.flow.nodes} >= {"ask_question", "condition", "assign_team"}
 
 
+def test_generated_routing_matches_requested_actions(monkeypatch) -> None:
+    from app.domain.simulator import reply_to_simulation, start_simulation
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "")
+    flow = generate_flow(ROUTING).flow
+    buyer = reply_to_simulation(flow, start_simulation(flow), "Buyer")
+    seller = reply_to_simulation(flow, start_simulation(flow), "Seller")
+
+    assert [action.payload["team_name"] for action in buyer.actions if action.type == "assign_team"] == ["Sales"]
+    assert buyer.trace == ["ask_role", "check_role", "assign_sales", "buyer_end"]
+    assert not any(action.type == "assign_team" for action in seller.actions)
+    assert any("seller help article" in message.text for message in seller.messages)
+    assert seller.trace == ["ask_role", "check_role", "send_help", "seller_end"]
+
+
 def test_demo_generator_builds_risky_flow_for_review(monkeypatch) -> None:
     monkeypatch.setenv("DEEPSEEK_API_KEY", "")
     result = generate_flow(RISKY)
@@ -54,6 +69,25 @@ def test_qualification_extracts_threshold_wait_and_team(monkeypatch) -> None:
     assert nodes["wait_for_sales"].duration_seconds == 600
     assert nodes["assign_enterprise"].team_name == "Priority Sales"
     assert validate_flow(flow).valid
+
+
+def test_qualification_more_than_80_uses_strict_boundary(monkeypatch) -> None:
+    from app.domain.simulator import reply_to_simulation, start_simulation
+
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "")
+    requirement = QUALIFICATION.replace("75 employees", "80 employees").replace("10 minutes", "7 minutes")
+    flow = generate_flow(requirement).flow
+    assert flow.node_map()["check_size"].value == 80
+    assert flow.node_map()["wait_for_sales"].duration_seconds == 420
+
+    at_boundary = reply_to_simulation(flow, start_simulation(flow), "80")
+    assert at_boundary.trace == ["ask_size", "check_size", "send_pricing", "standard_end"]
+    assert not any(action.type == "assign_team" for action in at_boundary.actions)
+
+    above_boundary = reply_to_simulation(flow, start_simulation(flow), "81")
+    assert above_boundary.trace == ["ask_size", "check_size", "wait_for_sales", "assign_enterprise", "enterprise_end"]
+    assert [action.payload["duration_seconds"] for action in above_boundary.actions if action.type == "wait"] == [420]
+    assert [action.payload["team_name"] for action in above_boundary.actions if action.type == "assign_team"] == ["Priority Sales"]
 
 
 def test_keyword_wait_assignment_preserves_intent(monkeypatch) -> None:

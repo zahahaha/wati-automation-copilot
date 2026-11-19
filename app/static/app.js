@@ -120,13 +120,25 @@ async function startSimulation() {
 }
 
 async function sendReply(value) {
-  const response = await fetch(`/api/simulations/${state.simulation.id}/reply`, {
-    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ value }),
-  });
-  const data = await response.json();
-  if (!response.ok) return showNotice(readError(data));
-  state.simulation = data;
-  renderSimulation();
+  if (!state.simulation || state.replyPending) return;
+  const { id, version } = state.simulation;
+  state.replyPending = true;
+  $("replyControls").querySelectorAll("button, input").forEach((control) => { control.disabled = true; });
+  try {
+    const response = await fetch(`/api/simulations/${id}/reply`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ value, expected_version: version }),
+    });
+    const data = await response.json();
+    if (state.simulation?.id !== id) return;
+    if (!response.ok) return showNotice(readError(data));
+    state.simulation = data;
+    renderSimulation();
+  } catch (error) {
+    showNotice(error.message || "Could not send reply.");
+  } finally {
+    state.replyPending = false;
+    $("replyControls").querySelectorAll("button, input").forEach((control) => { control.disabled = false; });
+  }
 }
 
 function renderSimulation() {

@@ -164,6 +164,7 @@ class SimulationState(BaseModel):
     id: str
     flow_id: str
     current_node_id: str
+    version: int = 0
     variables: dict[str, Any] = Field(default_factory=dict)
     messages: list[ChatMessage] = Field(default_factory=list)
     actions: list[MockAction] = Field(default_factory=list)

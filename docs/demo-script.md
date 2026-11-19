@@ -15,18 +15,17 @@
 
 ## 1:40–2:40 — Lead qualification
 
-1. Select **Lead qualification** and generate.
-2. Explain the free-text input notice and Enterprise Sales team warning.
-3. Start the test and enter `75`.
-4. Show condition evaluation, fast-forwarded wait, team assignment, and trace.
-5. Restart with `10` to show the self-service pricing path.
+1. Edit the prompt live to: `When a new lead asks for pricing, collect their company size. If they have more than 80 employees, wait 7 minutes and assign them to Enterprise Sales. Otherwise, send the self-service pricing page.` Generate and show the **generation mode** badge (AI generated or Offline rules).
+2. Show JSON `check_size.value = 80` and `wait_for_sales.duration_seconds = 420`; explain the free-text input and team warnings.
+3. Start the test and enter `80`. Show the false branch and self-service pricing page.
+4. Restart and enter `81`. Show the true branch, fast-forwarded seven-minute wait, Enterprise Sales assignment, and trace.
 
 ## 2:40–3:40 — Unsafe flow
 
 1. Select **Risky API call** and generate.
 2. Show the blocking dynamic URL/SSRF error and missing failure-path warning.
 3. Point out that **Start test** is disabled.
-4. Explain that API calls are mocked even for valid flows.
+4. If time allows, show the direct API call to start a blocked flow returns `422`. Explain that API calls are mocked even for valid flows.
 
 ## 3:40–4:15 — Quality and trade-offs
 
