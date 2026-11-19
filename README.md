@@ -5,7 +5,7 @@ A lightweight AI-assisted automation builder that converts plain-English intent 
 ## Submission at a glance
 
 - [One-page design and AI collaboration write-up](docs/write-up.md)
-- [3�C5 minute recording script](docs/demo-script.md)
+- [3–5 minute recording script](docs/demo-script.md)
 - Demo recording: **pending recording/upload**. Add its URL here before sending the submission; the script is not a recording.
 
 ## Why this design
@@ -102,11 +102,11 @@ The tests cover graph validation, unsafe API detection, both Buyer/Seller branch
 
 ```text
 app/
-?????? domain/          # Typed nodes, validation, and deterministic simulator
-?????? services/        # LLM/demo generator and plain-English explanation
-?????? static/          # Interactive single-page UI
-?????? main.py          # FastAPI routes
-?????? repositories.py  # Thread-safe in-memory storage
+������ domain/          # Typed nodes, validation, and deterministic simulator
+������ services/        # LLM/demo generator and plain-English explanation
+������ static/          # Interactive single-page UI
+������ main.py          # FastAPI routes
+������ repositories.py  # Thread-safe in-memory storage
 tests/               # Unit tests for core behavior
 docs/                # Take-home write-up and demo script
 ```

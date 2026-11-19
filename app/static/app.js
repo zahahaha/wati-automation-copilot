@@ -1,5 +1,5 @@
 const examples = {
-  routing: "When a new contact messages us, ask if they��re a buyer or seller, then route buyers to Sales and send sellers our help article.",
+  routing: "When a new contact messages us, ask if they’re a buyer or seller, then route buyers to Sales and send sellers our help article.",
   qualification: "When a new lead asks for pricing, collect their company size. If they have more than 50 employees, wait 5 minutes and assign them to Enterprise Sales. Otherwise, send the self-service pricing page.",
   keyword: "When someone types refund, wait 2 hours and assign the chat to Billing.",
   risky: "When a new contact messages us, ask the customer for a URL and call that URL with their contact information. If the API succeeds, assign them to Support.",
@@ -65,7 +65,7 @@ function renderFlow() {
   $("jsonOutput").textContent = JSON.stringify(state.flow, null, 2);
   $("explanationList").innerHTML = state.explanation.map((line) => `<li>${escapeHtml(line)}</li>`).join("");
   const cards = state.flow.nodes.map((node) => nodeCard(node)).join("");
-  $("flowCanvas").innerHTML = `<div class="trigger-card">? ${escapeHtml(state.flow.trigger.description)}</div><div class="node-grid">${cards}</div>`;
+  $("flowCanvas").innerHTML = `<div class="trigger-card">⚡ ${escapeHtml(state.flow.trigger.description)}</div><div class="node-grid">${cards}</div>`;
   switchTab("visual");
 }
 
@@ -89,23 +89,23 @@ function nodeSummary(node) {
 }
 
 function nodeLinks(node) {
-  if (node.type === "condition") return `? ${node.true_node_id} �� ? ${node.false_node_id || "missing"}`;
-  if (node.type === "api_call") return `? ${node.success_node_id} �� ? ${node.failure_node_id || "missing"}`;
-  return node.next_node_id ? `�� ${node.next_node_id}` : "";
+  if (node.type === "condition") return `✓ ${node.true_node_id} · ✕ ${node.false_node_id || "missing"}`;
+  if (node.type === "api_call") return `✓ ${node.success_node_id} · ✕ ${node.failure_node_id || "missing"}`;
+  return node.next_node_id ? `→ ${node.next_node_id}` : "";
 }
 
 function renderReview() {
   const review = state.review;
   const total = review.errors.length + review.warnings.length + review.info.length;
   $("reviewSummary").innerHTML = review.valid
-    ? `<span class="summary-chip ok">? Valid</span><span class="summary-chip warning">${review.warnings.length} warnings</span>`
+    ? `<span class="summary-chip ok">✓ Valid</span><span class="summary-chip warning">${review.warnings.length} warnings</span>`
     : `<span class="summary-chip error">${review.errors.length} errors</span><span class="summary-chip warning">${review.warnings.length} warnings</span>`;
   const issues = [...review.errors, ...review.warnings, ...review.info];
   $("issuesList").innerHTML = total === 0
-    ? `<div class="all-clear">? No issues found. This flow is ready for simulation.</div>`
-    : issues.map((issue) => `<div class="issue-card ${issue.severity}"><div class="issue-title"><span>${escapeHtml(issue.code)}</span><span class="issue-node">${escapeHtml(issue.node_id || "flow")}</span></div><p>${escapeHtml(issue.message)}</p>${issue.suggestion ? `<p class="issue-suggestion">? ${escapeHtml(issue.suggestion)}</p>` : ""}</div>`).join("");
+    ? `<div class="all-clear">✓ No issues found. This flow is ready for simulation.</div>`
+    : issues.map((issue) => `<div class="issue-card ${issue.severity}"><div class="issue-title"><span>${escapeHtml(issue.code)}</span><span class="issue-node">${escapeHtml(issue.node_id || "flow")}</span></div><p>${escapeHtml(issue.message)}</p>${issue.suggestion ? `<p class="issue-suggestion">↳ ${escapeHtml(issue.suggestion)}</p>` : ""}</div>`).join("");
   $("startSimulationButton").disabled = !review.valid;
-  $("startSimulationButton").textContent = review.valid ? "? Start test" : "Fix errors to test";
+  $("startSimulationButton").textContent = review.valid ? "▶ Start test" : "Fix errors to test";
 }
 
 async function startSimulation() {
@@ -150,11 +150,11 @@ function renderSimulation() {
   renderReplyControls(sim.input_request);
   if (sim.actions.length) {
     $("actionLog").classList.remove("hidden");
-    $("actionLog").innerHTML = sim.actions.map((action) => `<div class="action-item"><b>${escapeHtml(action.type)}</b> �� ${escapeHtml(action.detail)}</div>`).join("");
+    $("actionLog").innerHTML = sim.actions.map((action) => `<div class="action-item"><b>${escapeHtml(action.type)}</b> · ${escapeHtml(action.detail)}</div>`).join("");
   } else { $("actionLog").classList.add("hidden"); }
   $("traceBar").classList.remove("hidden");
-  $("traceBar").textContent = `${sim.status.toUpperCase()} �� ${sim.trace.join(" �� ")}`;
-  $("startSimulationButton").textContent = sim.status === "completed" || sim.status === "failed" ? "? Restart test" : "? Reset test";
+  $("traceBar").textContent = `${sim.status.toUpperCase()} · ${sim.trace.join(" → ")}`;
+  $("startSimulationButton").textContent = sim.status === "completed" || sim.status === "failed" ? "↻ Restart test" : "↻ Reset test";
 }
 
 function renderReplyControls(inputRequest) {
@@ -165,7 +165,7 @@ function renderReplyControls(inputRequest) {
     controls.innerHTML = inputRequest.options.map((option) => `<button class="reply-option" data-value="${escapeAttribute(option)}">${escapeHtml(option)}</button>`).join("");
     controls.querySelectorAll(".reply-option").forEach((button) => button.addEventListener("click", () => sendReply(button.dataset.value)));
   } else {
-    controls.innerHTML = `<input id="freeReply" class="free-reply" placeholder="Type a test answer��" /><button id="sendReplyButton" class="send-reply">Send</button>`;
+    controls.innerHTML = `<input id="freeReply" class="free-reply" placeholder="Type a test answer…" /><button id="sendReplyButton" class="send-reply">Send</button>`;
     $("sendReplyButton").addEventListener("click", () => sendReply($("freeReply").value));
     $("freeReply").addEventListener("keydown", (event) => { if (event.key === "Enter") sendReply(event.target.value); });
   }
@@ -188,7 +188,7 @@ function switchTab(name) {
 function setGenerating(isGenerating) {
   const button = $("generateButton");
   button.disabled = isGenerating;
-  button.querySelector("span").textContent = isGenerating ? "Compiling workflow��" : "Generate automation";
+  button.querySelector("span").textContent = isGenerating ? "Compiling workflow…" : "Generate automation";
 }
 
 function showNotice(message) {

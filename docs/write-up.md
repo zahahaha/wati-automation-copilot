@@ -1,10 +1,10 @@
-# Automation Builder Copilot �� Take-home write-up
+# Automation Builder Copilot — Take-home write-up
 
 ## Problem and MVP scope
 
 Chatbot automation builders are powerful but require users to translate business intent into nodes, variables, branches, and failure paths. The MVP lets a user describe an automation in plain English, compiles the description into a typed Wati-style flow, explains and reviews it, and runs a safe mock conversation.
 
-The MVP intentionally excludes authentication, persistent storage, a drag-and-drop editor, real Wati publishing, and real external actions. These exclusions keep the 4�C8 hour exercise focused on backend correctness and the user-value loop.
+The MVP intentionally excludes authentication, persistent storage, a drag-and-drop editor, real Wati publishing, and real external actions. These exclusions keep the 4–8 hour exercise focused on backend correctness and the user-value loop.
 
 ## Architecture and key decisions
 
@@ -25,7 +25,7 @@ One review example: an AI-assisted repository review identified that separate lo
 
 ## Manual review
 
-I manually reviewed node transitions, condition semantics (including 80 versus 81 for ��more than 80��), simulation pause/resume behavior, unsafe URL handling, exception boundaries, and the three demonstration scenarios. I verified that invalid flows cannot enter simulation and that no simulator node performs an external side effect. Schema validity alone does not guarantee the requested routing: tests must separately assert Buyer �� Sales and Seller �� help article using execution traces.
+I manually reviewed node transitions, condition semantics (including 80 versus 81 for “more than 80”), simulation pause/resume behavior, unsafe URL handling, exception boundaries, and the three demonstration scenarios. I verified that invalid flows cannot enter simulation and that no simulator node performs an external side effect. Schema validity alone does not guarantee the requested routing: tests must separately assert Buyer → Sales and Seller → help article using execution traces.
 
 ## Trade-offs and V2
 
