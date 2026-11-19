@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="AI-assisted Wati chatbot workflow builder" />
+    <title>Wati Automation Copilot</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-mark">W</div>
+        <div>
+          <h1>Automation Copilot</h1>
+          <p>Describe it. Review it. Test it.</p>
+        </div>
+        <div id="healthBadge" class="status-pill"><span></span> Checking API</div>
+      </header>
+
+      <main>
+        <section class="hero-grid">
+          <article class="panel intent-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">01 · INTENT</span>
+                <h2>What should happen?</h2>
+              </div>
+              <span class="sparkle">✦</span>
+            </div>
+            <textarea id="requirementInput" rows="9" placeholder="When a new contact messages us, ask if they’re a buyer or seller, then route buyers to sales and send sellers our help article."></textarea>
+            <div class="examples">
+              <span>Try an example</span>
+              <button class="example-chip" data-example="routing">Buyer / seller routing</button>
+              <button class="example-chip" data-example="qualification">Lead qualification</button>
+              <button class="example-chip" data-example="keyword">Refund routing</button>
+              <button class="example-chip danger-chip" data-example="risky">Risky API call</button>
+            </div>
+            <button id="generateButton" class="primary-button">
+              <span>Generate automation</span><b>→</b>
+            </button>
+            <div id="noticeBox" class="notice hidden"></div>
+          </article>
+
+          <article class="panel flow-panel">
+            <div class="panel-heading flow-heading">
+              <div>
+                <span class="eyebrow">02 · FLOW</span>
+                <h2 id="flowTitle">Generated workflow</h2>
+              </div>
+              <div id="modeBadge" class="mode-badge hidden"></div>
+            </div>
+            <div class="tabs" role="tablist">
+              <button class="tab active" data-tab="visual">Visual</button>
+              <button class="tab" data-tab="json">JSON</button>
+              <button class="tab" data-tab="explanation">Explanation</button>
+            </div>
+            <div id="emptyFlow" class="empty-state">
+              <div class="empty-icon">⌁</div>
+              <h3>Your automation will appear here</h3>
+              <p>Describe a workflow, then generate a structured and testable flow.</p>
+            </div>
+            <div id="visualTab" class="tab-content hidden"><div id="flowCanvas" class="flow-canvas"></div></div>
+            <div id="jsonTab" class="tab-content hidden"><pre id="jsonOutput"></pre></div>
+            <div id="explanationTab" class="tab-content hidden"><ol id="explanationList" class="explanation-list"></ol></div>
+          </article>
+        </section>
+
+        <section id="workspace" class="workspace-grid hidden">
+          <article class="panel review-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">03 · REVIEW</span>
+                <h2>Preflight check</h2>
+              </div>
+              <div id="reviewSummary" class="review-summary"></div>
+            </div>
+            <div id="issuesList" class="issues-list"></div>
+          </article>
+
+          <article class="panel simulator-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">04 · SIMULATE</span>
+                <h2>Test conversation</h2>
+              </div>
+              <button id="startSimulationButton" class="secondary-button">▶ Start test</button>
+            </div>
+            <div id="simulatorEmpty" class="simulator-empty">Run a safe mock conversation. API calls, waits, and assignments are simulated.</div>
+            <div id="conversation" class="conversation hidden"></div>
+            <div id="replyControls" class="reply-controls hidden"></div>
+            <div id="actionLog" class="action-log hidden"></div>
+            <div id="traceBar" class="trace-bar hidden"></div>
+          </article>
+        </section>
+      </main>
+      <footer>Built for a safe review-before-publish workflow · No external actions run during simulation</footer>
+    </div>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
