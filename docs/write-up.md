@@ -1,10 +1,10 @@
-# Automation Builder Copilot — Take-home write-up
+# Automation Builder Copilot �� Take-home write-up
 
 ## Problem and MVP scope
 
 Chatbot automation builders are powerful but require users to translate business intent into nodes, variables, branches, and failure paths. The MVP lets a user describe an automation in plain English, compiles the description into a typed Wati-style flow, explains and reviews it, and runs a safe mock conversation.
 
-The MVP intentionally excludes authentication, persistent storage, a drag-and-drop editor, real Wati publishing, and real external actions. These exclusions keep the 4–8 hour exercise focused on backend correctness and the user-value loop.
+The MVP intentionally excludes authentication, persistent storage, a drag-and-drop editor, real Wati publishing, and real external actions. These exclusions keep the 4�C8 hour exercise focused on backend correctness and the user-value loop.
 
 ## Architecture and key decisions
 
@@ -19,11 +19,13 @@ The LLM is therefore a compiler, not the runtime. Model output cannot directly c
 
 ## AI and agent usage
 
-With an API key, DeepSeek converts natural-language requirements to the constrained schema; offline, a small rule parser extracts supported parameters and rejects unsupported intent. The deterministic reviewer checks either result. During development, an AI coding agent helped draft alternatives, create test scenarios, and review failure cases, while the final domain model, execution semantics, validation thresholds, and security boundaries were manually selected.
+With an API key, DeepSeek converts natural-language requirements to the constrained schema; offline, a small rule parser extracts supported parameters and rejects unsupported intent. The deterministic reviewer checks either result. During development, an AI coding agent helped draft alternatives, create test scenarios, and review failure cases; I selected and checked the final domain model, execution semantics, validation thresholds, and security boundaries.
+
+One review example: an AI-assisted repository review identified that separate locks around simulation reads and writes allowed two replies to read the same question. I checked the stored state and found that the simulator mutates its input in place, which could also change a stored session before save. I added a client-visible session version and made version check, state-copy, transition, and save one locked operation. A duplicate-reply regression test checks that the second request gets `409` and the trace advances once.
 
 ## Manual review
 
-I manually reviewed node transitions, condition semantics, simulation pause/resume behavior, unsafe URL handling, exception boundaries, and the three demonstration scenarios. I also verified that invalid flows cannot enter simulation and that no simulator node performs an external side effect.
+I manually reviewed node transitions, condition semantics (including 80 versus 81 for ��more than 80��), simulation pause/resume behavior, unsafe URL handling, exception boundaries, and the three demonstration scenarios. I verified that invalid flows cannot enter simulation and that no simulator node performs an external side effect. Schema validity alone does not guarantee the requested routing: tests must separately assert Buyer �� Sales and Seller �� help article using execution traces.
 
 ## Trade-offs and V2
 

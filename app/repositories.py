@@ -3,6 +3,11 @@ from __future__ import annotations
 from threading import RLock
 
 from app.domain.models import Flow, SimulationState
+from app.domain.simulator import reply_to_simulation
+
+
+class StaleSimulationError(ValueError):
+    pass
 
 
 class InMemoryRepository:
@@ -28,6 +33,22 @@ class InMemoryRepository:
     def get_simulation(self, simulation_id: str) -> SimulationState | None:
         with self._lock:
             return self._simulations.get(simulation_id)
+
+    def reply_to_simulation(self, simulation_id: str, expected_version: int, value: object) -> SimulationState | None:
+        with self._lock:
+            state = self._simulations.get(simulation_id)
+            if state is None:
+                return None
+            if state.version != expected_version:
+                raise StaleSimulationError("Simulation has changed. Refresh the conversation before replying again.")
+            flow = self._flows.get(state.flow_id)
+            if flow is None:
+                raise LookupError("Flow not found")
+            # Work on a copy so a rejected reply cannot change the stored state.
+            updated = reply_to_simulation(flow, state.model_copy(deep=True), value)
+            updated.version = state.version + 1
+            self._simulations[simulation_id] = updated
+            return updated
 
 
 repository = InMemoryRepository()

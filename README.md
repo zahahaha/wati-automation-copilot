@@ -2,6 +2,12 @@
 
 A lightweight AI-assisted automation builder that converts plain-English intent into a structured Wati-style chatbot flow, explains and validates the flow, and runs a safe mock conversation before publishing.
 
+## Submission at a glance
+
+- [One-page design and AI collaboration write-up](docs/write-up.md)
+- [3�C5 minute recording script](docs/demo-script.md)
+- Demo recording: **pending recording/upload**. Add its URL here before sending the submission; the script is not a recording.
+
 ## Why this design
 
 The LLM is treated as a **workflow compiler, not the runtime**. It translates intent into a constrained `Flow` schema. Deterministic Python services then validate graph integrity, flag unsafe behavior, and execute simulations. This separation keeps runtime behavior testable and prevents model output from directly causing external side effects.
@@ -64,6 +70,8 @@ docker compose up --build
 | `POST` | `/api/flows/{id}/simulations` | Start a mock execution |
 | `POST` | `/api/simulations/{id}/reply` | Submit an answer to the current question |
 
+Replies include `{ "value": "Buyer", "expected_version": 0 }`, using the `version` returned when the simulation starts or last advances. A stale or duplicate reply returns `409`; only the first reply changes the trace. Restarting the server clears sessions.
+
 Interactive OpenAPI documentation is available at <http://127.0.0.1:8000/docs>.
 
 ## Validation rules
@@ -88,17 +96,17 @@ Flows with blocking errors cannot be simulated. Warnings remain visible but do n
 pytest -q
 ```
 
-The tests cover graph validation, unsafe API detection, both Buyer/Seller branches, rule parameter extraction, unsupported requests, provider failure, and invalid input.
+The tests cover graph validation, unsafe API detection, both Buyer/Seller branches, rule parameter extraction, unsupported requests, provider failure, invalid input, and duplicate simulation replies.
 
 ## Project structure
 
 ```text
 app/
-������ domain/          # Typed nodes, validation, and deterministic simulator
-������ services/        # LLM/demo generator and plain-English explanation
-������ static/          # Interactive single-page UI
-������ main.py          # FastAPI routes
-������ repositories.py  # Thread-safe in-memory storage
+?????? domain/          # Typed nodes, validation, and deterministic simulator
+?????? services/        # LLM/demo generator and plain-English explanation
+?????? static/          # Interactive single-page UI
+?????? main.py          # FastAPI routes
+?????? repositories.py  # Thread-safe in-memory storage
 tests/               # Unit tests for core behavior
 docs/                # Take-home write-up and demo script
 ```

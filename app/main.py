@@ -9,9 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from app.domain.models import Flow
-from app.domain.simulator import SimulationError, reply_to_simulation, start_simulation
+from app.domain.simulator import SimulationError, start_simulation
 from app.domain.validator import validate_flow
-from app.repositories import repository
+from app.repositories import StaleSimulationError, repository
 from app.services.explainer import explain_flow
 from app.services.generator import GenerationUnavailableError, generate_flow
 from app.services.rules import UnsupportedIntentError
@@ -23,6 +23,7 @@ class GenerateFlowRequest(BaseModel):
 
 class ReplyRequest(BaseModel):
     value: Any
+    expected_version: int = Field(ge=0)
 
 
 app = FastAPI(
@@ -94,14 +95,12 @@ def create_simulation(flow_id: str):
 
 @app.post("/api/simulations/{simulation_id}/reply")
 def reply(simulation_id: str, request: ReplyRequest):
-    state = repository.get_simulation(simulation_id)
-    if not state:
-        raise HTTPException(status_code=404, detail="Simulation not found")
-    flow = repository.get_flow(state.flow_id)
-    if not flow:
-        raise HTTPException(status_code=404, detail="Flow not found")
     try:
-        updated = reply_to_simulation(flow, state, request.value)
-    except SimulationError as exc:
+        updated = repository.reply_to_simulation(simulation_id, request.expected_version, request.value)
+    except (SimulationError, StaleSimulationError) as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
-    return repository.save_simulation(updated)
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+    return updated
